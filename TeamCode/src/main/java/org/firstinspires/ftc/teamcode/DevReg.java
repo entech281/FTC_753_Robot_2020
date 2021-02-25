@@ -84,8 +84,8 @@ public class DevReg
         //
 
         // Motors
-        //leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        //rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftDrive.setDirection(DcMotor.Direction.FORWARD); // AndyMark Motors are opposite of this
         rightDrive.setDirection(DcMotor.Direction.REVERSE);
 
@@ -113,21 +113,87 @@ public class DevReg
         // Servos
         //servoTest.setPosition(0.0); // I'm pretty sure this takes a float/double as a parameter
     }
+
     public void driveForward (double power, int duration) {
-        leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         int encoderR = rightDrive.getCurrentPosition();
-        int encoderL = rightDrive.getCurrentPosition();
+        int encoderL = leftDrive.getCurrentPosition();
+        leftDrive.setPower(-power);
+        rightDrive.setPower(-power);
+        while (encoderL > duration && encoderR > duration) {
+            encoderR = rightDrive.getCurrentPosition();
+            encoderL = leftDrive.getCurrentPosition();
+        }
+        leftDrive.setPower(0);
+        rightDrive.setPower(0);
+    }
+
+    public void driveBackward (double power, int duration) {
+        rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        int encoderR = rightDrive.getCurrentPosition();
+        int encoderL = leftDrive.getCurrentPosition();
         leftDrive.setPower(power);
         rightDrive.setPower(power);
         while (encoderL < duration && encoderR < duration) {
             encoderR = rightDrive.getCurrentPosition();
-            encoderL = rightDrive.getCurrentPosition();
+            encoderL = leftDrive.getCurrentPosition();
         }
         leftDrive.setPower(0);
         rightDrive.setPower(0);
-
     }
 
+    public void turnRight (double power, int duration) {
+        rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        int encoderR = rightDrive.getCurrentPosition();
+        int encoderL = leftDrive.getCurrentPosition();
+        leftDrive.setPower(-power);
+        rightDrive.setPower(power);
+        while (encoderL > duration) {
+            encoderR = rightDrive.getCurrentPosition();
+            encoderL = leftDrive.getCurrentPosition();
+        }
+        leftDrive.setPower(0);
+        rightDrive.setPower(0);
+    }
+
+    public void turnLeft (double power, int duration) {
+        rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        int encoderR = rightDrive.getCurrentPosition();
+        int encoderL = leftDrive.getCurrentPosition();
+        leftDrive.setPower(power);
+        rightDrive.setPower(-power);
+        while (encoderR > duration) {
+            encoderR = rightDrive.getCurrentPosition();
+            encoderL = leftDrive.getCurrentPosition();
+        }
+        leftDrive.setPower(0);
+        rightDrive.setPower(0);
+    }
+
+   /*   public void raiseDrawbridge (double power, int duration) {
+        rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        int encoderR = rightDrive.getCurrentPosition();
+        leftDrive.setPower(power);
+        while (encoderL > duration && encoderR > duration) {
+            encoderL = leftDrive.getCurrentPosition();
+        }
+        leftDrive.setPower(0);
+        rightDrive.setPower(0);
+     }
+*/
 
 }
+
