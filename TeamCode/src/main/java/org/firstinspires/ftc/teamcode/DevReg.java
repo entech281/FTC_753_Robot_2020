@@ -1,9 +1,20 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.Func;
+import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
 /////////////////////
 ////// DevReg ///////
@@ -20,7 +31,10 @@ public class DevReg
     public DcMotor rightSpin;
     public DcMotor drawBridge;
     public DcMotor spinHopper;
-
+    public BNO055IMU imu;
+    // State used for updating telemetry
+    Orientation angles;
+    Acceleration gravity;
 
     // Create new Servo Objects
     //public Servo servoTest; // Probably don't need = null since the variable is null by default
@@ -29,12 +43,27 @@ public class DevReg
     HardwareMap hwMap       = null; // Probably don't need = null since the variable is null by default
 
     // Constructor
-    public DevReg(){}; // I only stuck the brackets here because there's literally NOTHING HERE
+    public DevReg(){} // I only stuck the brackets here because there's literally NOTHING HERE
 
     public void init(HardwareMap ahwMap)
     {
         hwMap = ahwMap;
+        // Set up the parameters with which we will use our IMU. Note that integration
+        // algorithm here just reports accelerations to the logcat log; it doesn't actually
+        // provide positional information.
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+        parameters.loggingEnabled      = true;
+        parameters.loggingTag          = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
+        // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
+        // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
+        // and named "imu".
+        imu = hwMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
         //
         // Initialize Devices from Phone Configs
         //
@@ -84,5 +113,21 @@ public class DevReg
         // Servos
         //servoTest.setPosition(0.0); // I'm pretty sure this takes a float/double as a parameter
     }
-}
+    public void driveForward (double power, int duration) {
+        leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        int encoderR = rightDrive.getCurrentPosition();
+        int encoderL = rightDrive.getCurrentPosition();
+        leftDrive.setPower(power);
+        rightDrive.setPower(power);
+        while (encoderL < duration && encoderR < duration) {
+            encoderR = rightDrive.getCurrentPosition();
+            encoderL = rightDrive.getCurrentPosition();
+        }
+        leftDrive.setPower(0);
+        rightDrive.setPower(0);
 
+    }
+
+
+}

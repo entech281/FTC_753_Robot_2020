@@ -95,7 +95,7 @@ public class PushbotTeleopTank_Iterative extends OpMode{
         double right;
 
         // Run wheels in tank mode (note: The joystick goes negative when pushed forwards, so negate it)
-        left = -gamepad1.left_trigger        right = -gamepad1.right_stick_y;
+        left = -gamepad1.left_trigger;        right = -gamepad1.right_stick_y;
 
         robot.leftDrive.setPower(left);
         robot.rightDrive.setPower(right);
